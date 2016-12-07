@@ -12,9 +12,14 @@
             padding: 10px;
             border-radius: 7px;
             pointer-events: none;
-            width: 150px;
-            height: 50px;
+            width: 182px;
+            height: 41px;
+            padding-top:14px;
             text-align: center;
+        }
+
+        .bold{
+            font-weight: bold;
         }
 
         #scaleArrow {
@@ -33,10 +38,14 @@
             alignment-baseline: central;
         }
 
+        .left{
+            text-align: left;
+        }
+
         #yearSlider {
             position: absolute;
-            top: 928px;
-            left: 912px;
+            top: 389px;
+            left: 953px;
             width: 200px
         }
 
@@ -110,7 +119,7 @@
         .caption {
             font-size: 16px;
             color: #444;
-            font-family: 'Lobster', cursive;
+            //font-family: 'Lobster', cursive;
         }
 
         .third {
@@ -225,13 +234,36 @@
         input[type=range]:focus::-ms-fill-upper {
             background: lightblue;
         }
+
+        .nonrenewableRect{
+            fill:none;
+            fill: #ffdac9;
+        }
+
+        .renewableRect{
+            fill:none;
+            fill: #e6ffd3;
+        }
+
+        #wrapper{
+            position:relative;
+            margin-left: auto;
+            margin-right:auto;
+            display: inline-block;
+        }
+
+        body{
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
+    <div id="wrapper">
+
     <h1>The boom of the renewable energies in Europe</h1>
     <div style="position: absolute; background: lightblue; height: 300px; top: 350px; width:182px; font-size: 22px; padding: 15px; border-radius: 10px; left: 20px;">
-    The production of renewable energies in Europe has skyrocketed during the last 2 decades, getting to as much as 50% of the energy consumed in countries like Sweden.</div>
+    The consumption of renewable energies in Europe has skyrocketed during the last 2 decades, getting to as much as 50% of the energy consumed in countries like Sweden.</div>
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://d3js.org/topojson.v1.min.js"></script>
     <script>
@@ -270,7 +302,7 @@
         var perClicked = 0.4;
         var aux = 0;
 
-        var svg = d3.select("body").append("svg")
+        var svg = d3.select("#wrapper").append("svg")
             .attr("width", width)
             .attr("height", height);
 
@@ -280,12 +312,20 @@
             .attr("transform", "translate(" + infoBarX + "," + infoBarY + ")");
 
 
-        var infoBarTitle = infoBar.append("text").attr("class", "title1");
+        var infoBarTitle = infoBar
+            .append("text")
+            .attr("class", "title1")
+            .attr("text-anchor", "middle")
+            .attr("transform", "translate(200, 0)");
 
-        var yearText = svg.append("text").attr("transform", "translate(" + (85 + infoBarX) + "," + (height - infoBarY) + ")")
+        var yearText = infoBar
+            .append("text")
+            .attr("transform", "translate(130,260)")
             .attr("class", "title1")
             .attr("font-size", "51px")
             .text(currentYear);
+
+
 
         var pieImages = ["nonRen.png", "Ren.png"];
         var legendImages = ["Coal.png", "Petroleum.png", "Gas.png", "Nuclear.png", "Hydro.png", "Wind.png", "Solar.png", "Biofuels.png", "Geothermal.png"];
@@ -306,14 +346,39 @@
 
         var currentCountry = null;
 
-        var infoBarPieX = 50;
+        var infoBarPieX = 100;
         var infoBarPieY = 20;
 
         var infoBarPie = infoBar.append("g")
             .attr("class", "infoBarPie pie")
             .attr("transform", "translate(" + infoBarPieX  + ", " + infoBarPieY + ")");
 
-        var legendPie = infoBar.append("g");
+        var legendPie = infoBar
+            .append("g")
+            .attr("class", "legendPie");
+
+        infoBar
+                .append("rect")
+                .attr("class", "nonrenewableRect")
+                .attr("width", "400px")
+                // .attr("rx", 20)
+                // .attr("ry", 20)
+                .attr("height", "140px")
+                .attr("transform", "translate(0, 350)");
+
+        infoBar
+                .append("rect")
+                .attr("class", "renewableRect")
+                .attr("width", "400px")
+                // .attr("rx", 20)
+                // .attr("ry", 20)
+                .attr("height", "162px")
+                .attr("transform", "translate(0, 490)");
+
+        var barChart = infoBar
+            .append("g")
+            .attr("class","barChart")
+            .attr("transform", "translate(120,40)");
 
         //Defining the different color scales
         var color = d3.scale.threshold()
@@ -360,18 +425,6 @@
         });
 
 
-        // var leftText = svg.append("g")
-        //     .attr("class", "leftText")
-        //     .attr("transform", "translate(40px, 270px);")
-
-        // leftText.append("text")
-        //     .append('tspan')
-        //     .text("The production of renewable energies in Europe has skyrocketed during the last 2 decades, getting to as much as 50% of the energy consumed in countries like Sweden.")
-        //     .attr("width", "100px")
-        //     .attr("height", "200px");
-
-
-
         //Setting the initial form of the page which will be dinamically modified later
         function initialDraw() {
 
@@ -409,6 +462,15 @@
                     return path(d);
                 });
 
+
+
+            infoBar
+                .append("g")
+                .attr("transform", "translate(50,340)")
+                .append("text")
+                .attr("class", "bold")
+                .html("Proportion of energy consumption by source");
+
             //Loading data for the barchart
             var myBarData = Object.keys(countries[50].energy[currentYear])
                 .filter(excludeTotals)
@@ -424,7 +486,7 @@
                             type: d,
                             value: 0,
                             total: countries[50].energy[currentYear]["All products"]
-                        }; // {type:d, value:1};
+                        };
                     };
                 }).filter(function(d) {
                     return d != null;
@@ -435,7 +497,7 @@
 
             //Loading the data for the pie chart
             var myPieData = [{
-                type: "Non-Rrenewable energies",
+                type: "Non-renewable energies",
                 total: totalEU,
                 value: totalEU - renEU
             }, {
@@ -497,16 +559,10 @@
                 })
                 .attr("text-anchor", "middle");
 
-            /*arcs.append("svg:image")
-                .attr("xlink:href", function(d, i) {
-                    return pieImages[i]
-                })
-                .attr("width", 50)
-                .attr("height", 50);*/
 
 
             //Creating the bar chart
-            var legend = infoBarPie.selectAll("g.legend")
+            var legend = barChart.selectAll("g.legend")
                 .data(myBarData)
                 .enter()
                 .append('g')
@@ -520,7 +576,6 @@
 
                 });
 
-            //console.log(legendImages);
             legend.append("rect")
                 .attr('width', rectSize)
                 .attr('height', rectSize)
@@ -540,37 +595,14 @@
                 })
                 .attr('width', rectSize)
                 .attr('height', rectSize);
-
-
-            // var labelBox = legend.append("g")
-            //     .attr("fill", "black");
             //Adding labels
             var legendLabels = legend.append("text")
                 .attr("class", "legendLabels2")
                 .attr("transform", "translate(-2," + 20 + ")")
                 .attr("text-anchor", "end")
-
                 .text(function(d) {
                     return d.type
                 });
-
-                //.each(function(d) {
-                //     d.labelWidth = this.getBBox().width;
-                //     console.log(d);
-                // });
-                //.attr("transform", function(d){ return "translate(" + -d.labelWidth + ", -40)"; });
-
-            // svg.selectAll('text.legendLabels2')[0].forEach(function(label, i) {
-            //      console.log(label);
-            //      // label.attr("stroke", "white");
-            // // //     //console.log(j);
-
-
-
-            // });
-
-
-            //legendLabels
 
             //Creating arrow for map key
             var arrowL = svg.append("svg:image")
@@ -655,7 +687,7 @@
 
                     hoverArrow(per);
 
-                    return d.name + "<br>" + fmtPer(per) + " renewables"
+                    return "<b>" + d.name + "</b><br/>" + fmtPer(per) + " renewables"
                 })
                 .classed("hidden", false);
         }
@@ -675,18 +707,14 @@
         //Tooltip for pie chart
         function mouseoverTooltip(d) {
             var mouseCoords = d3.mouse(this);
-            var shiftX = infoBarX + infoBarPieY + 140;
-            var shiftY = infoBarY + infoBarPieX + 70;
+            var shiftX = infoBarX + infoBarPieY + 192;
+            var shiftY = infoBarY + infoBarPieX + 28;
 
             d3.select("#tooltip")
                 .style("left", (mouseCoords[0] + shiftX + "px"))
                 .style("top", (mouseCoords[1] + shiftY + "px"))
-                .text(function() {
-                    if (d.value / 10000000 > 1)
-                        return (d.data.type + ": " + Math.round(d.value / 1000000) + " ExaJoules")
-                    if (d.value / 10000 > 1)
-                        return (d.data.type + ": " + Math.round(d.value / 1000) + " PetaJoules")
-                    return (d.data.type + ": " + d.value + " TeraJoules")
+                .html(function() {
+                    return ("<b>" + d.data.type + "</b><br>" + Math.round(d.value / 1000) + " PetaJoules")
                 })
                 .classed("hidden", false);
         }
@@ -694,18 +722,14 @@
         //Tooltip for bar chart
         function mouseoverTooltip2(d, i) {
             var mouseCoords = d3.mouse(this);
-            var shiftX = infoBarX + infoBarPieY + 72;
-            var shiftY = infoBarY + infoBarPieX + 283;
+            var shiftX = infoBarX + infoBarPieY + 137;
+            var shiftY = infoBarY + infoBarPieX + 260;
 
             d3.select("#tooltip")
                 .style("left", (mouseCoords[0] + shiftX + "px"))
-                .style("top", (mouseCoords[1] + shiftY + 25 * i + "px"))
-                .text(function() {
-                    if (d.value / 10000000 > 1)
-                        return (d.type + ": " + Math.round(d.value / 1000000) + " ExaJoules")
-                    if (d.value / 10000 > 1)
-                        return (d.type + ": " + Math.round(d.value / 1000) + " PetaJoules")
-                    return (d.type + ": " + d.value + " TeraJoules")
+                .style("top", (mouseCoords[1] + shiftY + 27 * i + "px"))
+                .html(function() {
+                    return ("<b>" + d.type + " " + fmtPer(d.value/d.total) + "</b><br>" + Math.round(d.value / 1000) + " PetaJoules")
                 })
                 .classed("hidden", false);
         }
@@ -820,6 +844,8 @@
                 value: renEn
             }];
 
+
+
             var pieData = pie(myPieData);
 
             infoBarPie.selectAll("g.arc")
@@ -845,15 +871,17 @@
                 .attr("transform", function(d) {
                     return "translate(" + arc.centroid(d) + ")";
                 });
-            infoBarPie.selectAll("image")
+            /*infoBarPie.selectAll("image")
                 .data(pieData)
                 .transition()
                 .duration(1000)
                 .attr("transform", function(d) {
                     return "translate(" + arc.centroid(d)[0] + "," + arc.centroid(d)[1] + ")";
-                });
+                });*/
 
-            var legend = infoBarPie.selectAll("g.legend");
+            var legend = barChart.selectAll("g.legend").data(myBarData);
+
+
 
 
 
@@ -899,9 +927,11 @@
 
     <div id="tooltip" class="hidden"></div>
 
+    </div>
+
 
     <p>Simon Partridge / Luis Serra Garcia<br> Instructor: Suresh Lodha<br> CMPS 165: Data programming for Visualization Fall 2016</p>
-
+<div class="left">
     <div class="third">
         <h2>Files Submitted</h2>
         <ul>
@@ -911,6 +941,7 @@
             <li>processCSV.js</li>
             <li>eu.geojson</li>
             <li>energyConsumption.csv</li>
+            <li>Various energy symbols</li>
         </ul>
 
     </div>
@@ -919,6 +950,8 @@
         <h2>Data Sources</h2>
         <a href="http://ec.europa.eu/eurostat/web/energy/data/database" target="_blank">Eurostat Energy Database: Energy Data</a><br>
         <a href="http://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/" target="_blank">Natural Earth Data: Shape Files</a>
+        <br>
+        <a href="https://www.iconfinder.com/" target="_blank">Energy Source Icons</a>
 
 
 
@@ -936,6 +969,8 @@
 
 
     </div>
+</div>
+
 
 </body>
 
